@@ -1,0 +1,32 @@
+[workspace]
+members = ["integration"]
+resolver = "2"
+
+[workspace.package]
+edition = "2021"
+
+[workspace.dependencies]
+miden-client = { version = "0.13", features = ["tonic", "testing"] }
+miden-client-sqlite-store = { version = "0.13", package = "miden-client-sqlite-store" }
+miden-standards = { version = "0.13", default-features = false, features = ["testing"] }
+miden-core = { version = "0.20" }
+miden-testing = "0.13"
+miden-mast-package = { version = "0.20", default-features = false }
+miden-protocol = "0.13"
+miden-tx = "0.13"
+miden-multisig-client = { path = "/Users/brianseong/Developer/Miden/Team/private-state-manager/crates/miden-multisig-client" }
+tokio = { version = "1.40", features = ["rt-multi-thread", "net", "macros", "fs"] }
+rand = "0.9"
+anyhow = "1.0"
+thiserror = "2.0"
+async-trait = "0.1"
+sha3 = "0.10"
+hex = "0.4"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+dotenvy = "0.15"
+
+# Redirect PSM's git miden-client to the published crates.io version
+[patch."https://github.com/0xMiden/miden-client"]
+miden-client = { version = "0.13" }
+miden-client-sqlite-store = { version = "0.13", package = "miden-client-sqlite-store" }
