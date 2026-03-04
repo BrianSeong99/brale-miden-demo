@@ -64,6 +64,7 @@ async fn main() -> Result<()> {
         .await
         .context("failed to build client")?;
 
+    client.sync_state().await.context("failed to sync state")?;
     operations::transfer_tokens(&mut client, sender_id, recipient_id, issuer_id, amount).await?;
 
     println!("Transferred {amount} tokens from {sender_id} to {recipient_id}");

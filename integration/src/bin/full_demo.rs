@@ -59,6 +59,9 @@ async fn main() -> Result<()> {
         .await
         .context("failed to build client")?;
 
+    // Sync with network to populate local store with block data
+    client.sync_state().await.context("failed to sync state")?;
+
     // Step 1: Deploy issuer
     println!("=== Step 1: Deploy Issuer ===");
     let issuer = operations::deploy_issuer_account(

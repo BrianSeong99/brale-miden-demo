@@ -64,6 +64,7 @@ async fn main() -> Result<()> {
         .await
         .context("failed to build client")?;
 
+    client.sync_state().await.context("failed to sync state")?;
     operations::mint_tokens(&mut client, issuer_id, target_id, amount).await?;
 
     println!("Minted {amount} tokens from {issuer_id} to {target_id}");

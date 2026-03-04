@@ -60,6 +60,7 @@ async fn main() -> Result<()> {
         .await
         .context("failed to build client")?;
 
+    client.sync_state().await.context("failed to sync state")?;
     operations::burn_tokens(&mut client, sender_id, issuer_id, amount).await?;
 
     println!("Burned {amount} tokens (sender: {sender_id}, issuer: {issuer_id})");
