@@ -337,6 +337,47 @@ pub async fn read_total_supply(
     Ok(total_supply)
 }
 
+/// Token metadata read from a faucet's storage.
+#[derive(Debug, Clone)]
+pub struct TokenMetadata {
+    pub symbol: TokenSymbol,
+    pub decimals: u8,
+    pub max_supply: u64,
+}
+
+/// Read token metadata (symbol, decimals, max supply) from a faucet account.
+///
+/// The metadata is stored in the faucet's reserved metadata slot by `BasicFungibleFaucet`.
+pub async fn read_token_metadata(
+    client: &Client<BraleKeystore>,
+    issuer_id: AccountId,
+) -> Result<TokenMetadata> {
+    let record = client
+        .get_account(issuer_id)
+        .await
+        .context("failed to get issuer account")?
+        .context("issuer account not found")?;
+
+    let account = match record.account_data() {
+        AccountRecordData::Full(acc) => acc,
+        AccountRecordData::Partial(_) => anyhow::bail!("issuer {issuer_id} is only partially tracked"),
+    };
+
+    let metadata_word = account
+        .storage()
+        .get_item(BasicFungibleFaucet::metadata_slot())
+        .context("failed to read metadata storage slot")?;
+
+    // Metadata layout: [max_supply, decimals, token_symbol, 0]
+    let max_supply = metadata_word[0].as_int();
+    let decimals = metadata_word[1].as_int() as u8;
+    let symbol = TokenSymbol::try_from(metadata_word[2])
+        .context("invalid token symbol in faucet metadata")?;
+
+    info!(%issuer_id, ?symbol, decimals, max_supply, "read token metadata");
+    Ok(TokenMetadata { symbol, decimals, max_supply })
+}
+
 /// Sync client state with the network.
 pub async fn sync_and_track(client: &mut Client<BraleKeystore>) -> Result<()> {
     let summary = client.sync_state().await.context("failed to sync state")?;

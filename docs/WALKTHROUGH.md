@@ -21,6 +21,10 @@ working code, and how PSM enables institutional multisig custody.
 | 11 | Deposit detection | **Working** | `operations.rs` — `consume_notes()` + `sync_state()` |
 | 12 | Fee estimation | **Roadmap** | [RFI Requirements §10](guide/05-rfi-requirements.md#10-fee-estimation--simulation) |
 | 13 | Account activation / opt-in | **None required** | [RFI Requirements §11](guide/05-rfi-requirements.md#11-account-activation--token-opt-in) |
+| 14 | Read token metadata | **Working** | `operations.rs` — `read_token_metadata()` |
+| — | Signing test vectors | **Working** | [SIGNING_TEST_VECTORS.md](SIGNING_TEST_VECTORS.md) |
+| — | Brale ↔ Miden mapping | **Documented** | [Integration Mapping](guide/08-brale-integration-mapping.md) |
+| — | Auth scheme clarification | **Documented** | [Signer Injection §Auth Schemes](guide/03-signer-injection.md#supported-authentication-schemes) |
 
 ## Quick Start
 
@@ -40,8 +44,10 @@ make full-demo                # E2E: deploy → mint → transfer → burn
 5. [RFI Requirements Walkthrough](guide/05-rfi-requirements.md) — all 12 requirements mapped to working code
 6. [Testing](guide/06-testing.md) — `MockChain`, test inventory, running tests
 7. [What's Next](guide/07-whats-next.md) — compliance roadmap, production gaps, appendices
+8. [Brale ↔ Miden Integration Mapping](guide/08-brale-integration-mapping.md) — concept mapping, transaction lifecycle, deposit detection, address lifecycle
 
 ## Related Documents
 
 - [SIGNING_SPEC.md](SIGNING_SPEC.md) — byte-level signing protocol specification
+- [SIGNING_TEST_VECTORS.md](SIGNING_TEST_VECTORS.md) — deterministic test vectors for MPC integration validation
 - [COMPLIANCE_ROADMAP.md](COMPLIANCE_ROADMAP.md) — compliance controls timeline and design
