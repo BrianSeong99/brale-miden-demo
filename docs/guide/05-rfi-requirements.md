@@ -335,6 +335,10 @@ operations::consume_notes(&mut client, recipient_id).await?;
 ID matches the target. If account B tries to consume a note addressed to account A,
 execution fails with `ERR_P2ID_TARGET_ACCT_MISMATCH`.
 
+**Throughput**: Miden supports up to ~1000 output notes per transaction. For batch
+operations (e.g. distributing tokens to many recipients), split into multiple
+transactions.
+
 **Test**: `consume_multiple_notes` in `tests/single_signer_test.rs` — verifies that
 two P2ID notes (100 + 50 tokens) can be consumed in a single transaction, resulting
 in balance 150.

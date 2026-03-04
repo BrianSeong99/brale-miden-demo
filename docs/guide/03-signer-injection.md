@@ -136,6 +136,44 @@ deterministic nonce generation (same as Ethereum).
 In production, replace `SimulatedMpcSigner` with an HTTP client that calls
 Blockdaemon BV's signing API. The trait interface is the same.
 
+## Supported Authentication Schemes
+
+Miden supports two signature schemes for account authentication. **Ed25519 is not
+supported** — the RFI response was incorrect on this point.
+
+### ECDSA K256 (secp256k1) — Recommended for Brale
+
+- **Same curve as Ethereum**. Key material, signing, and verification are identical.
+- **MPC-compatible**. Blockdaemon BV, Fireblocks, and other MPC providers already
+  support secp256k1 threshold signing. No new cryptographic integration needed.
+- **This demo uses this scheme** via `AuthEcdsaK256Keccak`.
+- The digest format is Keccak256 (same as `eth_sign`). MPC providers receive a
+  standard 32-byte hash and return a standard 65-byte ECDSA signature.
+- Account component: `AuthEcdsaK256Keccak`
+
+### RPO-Falcon512 (Post-Quantum)
+
+- **Lattice-based signature scheme** (NIST PQC finalist family).
+- Provides post-quantum security, but **not recommended for Brale's use case**:
+  - Key sharding for MPC is complex for lattice schemes — no standard MPC protocol
+    exists for Falcon.
+  - Larger signatures (~700 bytes vs 65 bytes for ECDSA).
+  - No existing MPC provider support.
+- Suitable for single-signer scenarios where post-quantum resistance is required.
+- Account component: `AuthRpoFalcon512`
+
+### Why ECDSA K256 is the Right Choice
+
+For a custody provider like Brale, the signing infrastructure is the critical path.
+ECDSA K256 means:
+
+1. **Zero MPC changes** — Blockdaemon BV already supports secp256k1
+2. **Same key material** — existing Ethereum keys work on Miden
+3. **Same signing flow** — receive Keccak256 digest, return ECDSA signature
+4. **Battle-tested** — years of production use across Ethereum ecosystem
+
+---
+
 ## Production Integration: What Changes
 
 | Component | This Demo | Production |

@@ -5,8 +5,9 @@
 mod test_utils;
 
 use miden_protocol::account::AccountStorage;
-use miden_protocol::asset::FungibleAsset;
+use miden_protocol::asset::{FungibleAsset, TokenSymbol};
 use miden_protocol::note::NoteType;
+use miden_standards::account::faucets::BasicFungibleFaucet;
 use miden_testing::{Auth, MockChain};
 
 // ---------------------------------------------------------------------------
@@ -157,6 +158,34 @@ async fn consume_multiple_notes() -> anyhow::Result<()> {
     let mut wallet = wallet;
     wallet.apply_delta(executed_tx.account_delta())?;
     test_utils::assert_balance(&wallet, faucet.id(), 150);
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn read_token_metadata_from_faucet() -> anyhow::Result<()> {
+    let mut builder = MockChain::builder();
+    let faucet = builder.add_existing_basic_faucet(
+        Auth::EcdsaK256KeccakAuth,
+        "USDB",
+        1_000_000_000,
+        None,
+    )?;
+    let _chain = builder.build()?;
+
+    // Read metadata slot directly (same approach as read_token_metadata in operations.rs)
+    let metadata_word = faucet
+        .storage()
+        .get_item(BasicFungibleFaucet::metadata_slot())?;
+
+    let max_supply = metadata_word[0].as_int();
+    let decimals = metadata_word[1].as_int() as u8;
+    let symbol = TokenSymbol::try_from(metadata_word[2])?;
+
+    assert_eq!(symbol, TokenSymbol::new("USDB")?);
+    assert_eq!(max_supply, 1_000_000_000);
+    // MockChain default decimals
+    assert!(decimals <= 12, "decimals should be within valid range");
 
     Ok(())
 }
