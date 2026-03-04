@@ -11,9 +11,12 @@ for Miden multisig operations. It solves the problem: "How do N parties coordina
 to sign a single Miden transaction when each party has their own key?"
 
 On Ethereum, multisig is typically an on-chain contract (like Gnosis Safe) that
-collects signatures and executes when threshold is met. On Miden, the account's
-authentication procedure verifies a threshold of ECDSA signatures, but the
-coordination of collecting those signatures happens off-chain via PSM.
+collects signatures and executes when threshold is met — all visible on-chain. On
+Miden, the account's authentication procedure verifies a threshold of ECDSA
+signatures, but the coordination of collecting those signatures happens off-chain
+via PSM. The result is a **private multisig**: the network only sees a single
+valid transaction with a threshold proof, not the individual signatures or the
+coordination process.
 
 PSM provides:
 - **Delta proposals** — one signer proposes a transaction, others review and sign

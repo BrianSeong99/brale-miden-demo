@@ -32,13 +32,26 @@ Account
 └── Nonce      Monotonically increasing counter (replay protection)
 ```
 
-**Account types** relevant to Brale:
+**Account types:**
 
-- **Regular Account** — a wallet that can hold and send tokens. Equivalent to an
-  EOA + smart wallet on Ethereum.
-- **Fungible Faucet** — an issuer account that can mint and burn a fungible token.
-  Equivalent to deploying an ERC-20 contract on Ethereum, except the token is a
-  native protocol asset rather than a storage mapping in a contract.
+Miden has exactly four account types, encoded in a 2-bit field within the account ID.
+The high bit distinguishes faucets (issuers) from regular accounts (wallets). The low
+bit distinguishes immutable from updatable code.
+
+| Type | Bits | Purpose | Ethereum Analog |
+|------|------|---------|-----------------|
+| `RegularAccountImmutableCode` | `00` | Smart contract wallet with fixed code. Cannot be upgraded after creation. Use for custodied wallets where the auth logic never changes. | Non-upgradeable smart contract wallet |
+| `RegularAccountUpdatableCode` | `01` | Smart contract wallet with updatable code. Code can be modified after deployment. Use when the account's logic may evolve (e.g. adding new procedures, changing auth schemes). | Upgradeable smart contract (EIP-1967 proxy pattern) |
+| `FungibleFaucet` | `10` | Token issuer for fungible assets. Can mint (distribute) and burn fungible tokens. Token symbol, decimals, and max supply are set at creation. | ERC-20 contract deployment |
+| `NonFungibleFaucet` | `11` | Token issuer for non-fungible assets. Can mint and burn unique tokens (NFTs). Each asset carries a unique identifier. | ERC-721 contract deployment |
+
+**Which type for Brale?**
+
+- **Wallets** use `RegularAccountImmutableCode` — Brale-custodied wallets with ECDSA
+  K256 auth. The auth logic is fixed; key rotation is handled by creating new accounts,
+  not upgrading code.
+- **Stablecoin issuers** use `FungibleFaucet` — the faucet's account ID becomes the
+  token's identity, and the protocol enforces max supply.
 
 **Storage modes:**
 
@@ -137,7 +150,6 @@ User wallets can be **private** — balances are not visible to the network.
 | Gas / `estimateGas` | Client-side proving cost | No gas market; computation cost is local |
 | Block confirmations | Proof verification | Proof verified = included (no reorgs currently) |
 | Nonce | Account nonce | Same: monotonically incrementing, prevents replay |
-| `keccak256` | Poseidon2 (internal) | External signers still receive a keccak256 digest |
 | MPC / Fireblocks | `ExternalSigner` trait | Same secp256k1 curve; identical key material |
 | `approve` + `transferFrom` | Direct P2ID note | No approval step needed |
 | Mempool | Local execution | Transactions built and proven locally before submission |
