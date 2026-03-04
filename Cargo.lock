@@ -2001,6 +2001,8 @@ dependencies = [
 [[package]]
 name = "miden-confidential-contracts"
 version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "21169d9ed7d2b3c0c51802d67d95f99948c120cad2075fb5fc379cc3b47fe62a"
 dependencies = [
  "anyhow",
  "miden-protocol",
@@ -2178,6 +2180,8 @@ dependencies = [
 [[package]]
 name = "miden-multisig-client"
 version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8d74b83750999232a864aa9e5c5616d71ebe2c11f76a4c2ca601811972e01a90"
 dependencies = [
  "anyhow",
  "base64",
@@ -3198,6 +3202,8 @@ dependencies = [
 [[package]]
 name = "private-state-manager-client"
 version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "736ec07f76569b8c30035dcc5469bb36d8862ff5e1eb286d4226ce6f2a2c2472"
 dependencies = [
  "chrono",
  "hex",
@@ -3216,6 +3222,8 @@ dependencies = [
 [[package]]
 name = "private-state-manager-shared"
 version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "29c11cefe47334271926202c7d35658238f38fe130f9353e89cfa87c83811982"
 dependencies = [
  "base64",
  "hex",
