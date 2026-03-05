@@ -31,7 +31,7 @@ working code, and how PSM enables institutional multisig custody.
 ```bash
 cp .env.example .env          # configure endpoints
 make build                    # compile everything
-make test                     # run 16 tests (no network needed)
+make test                     # run 18 tests (no network needed)
 make full-demo                # E2E: deploy → mint → transfer → burn
 ```
 
@@ -48,6 +48,7 @@ make full-demo                # E2E: deploy → mint → transfer → burn
 
 ## Related Documents
 
+- [DEMO_WALKTHROUGH.md](DEMO_WALKTHROUGH.md) — step-by-step breakdown of `full-demo` and `multisig-demo`
 - [SIGNING_SPEC.md](SIGNING_SPEC.md) — byte-level signing protocol specification
 - [SIGNING_TEST_VECTORS.md](SIGNING_TEST_VECTORS.md) — deterministic test vectors for MPC integration validation
 - [COMPLIANCE_ROADMAP.md](COMPLIANCE_ROADMAP.md) — compliance controls timeline and design
