@@ -1,6 +1,6 @@
 # RFI Requirements Walkthrough
 
-[Back to Index](../WALKTHROUGH.md) | [Previous: PSM Multisig](04-psm-multisig.md)
+[Back to Guide Index](../../README.md#guide) | [Previous: PSM Multisig](04-psm-multisig.md)
 
 ---
 
@@ -26,6 +26,7 @@ exists once it has an ID derived from its initial state.
 pub async fn create_wallet_account(
     client: &mut Client<BraleKeystore>,
     pub_key: &ecdsa_k256_keccak::PublicKey,
+    storage_mode: AccountStorageMode,
 ) -> Result<Account> {
     let mut init_seed = [0u8; 32];
     client.rng().fill_bytes(&mut init_seed);
@@ -33,7 +34,7 @@ pub async fn create_wallet_account(
 
     let account = AccountBuilder::new(init_seed)
         .account_type(AccountType::RegularAccountImmutableCode)
-        .storage_mode(AccountStorageMode::Private)
+        .storage_mode(storage_mode)
         .with_component(BasicWallet)
         .with_auth_component(AuthEcdsaK256Keccak::new(pub_key_commitment))
         .build()?;
@@ -48,7 +49,7 @@ pub async fn create_wallet_account(
 2. Derive a `PublicKeyCommitment` from the ECDSA public key
 3. Build the account with:
    - `RegularAccountImmutableCode` — standard wallet, code cannot change after creation
-   - `Private` storage — only a commitment stored on-chain (balance not visible)
+   - Caller-controlled `storage_mode` — `Public` for explorer visibility, `Private` for balance privacy
    - `BasicWallet` component — standard send/receive procedures
    - `AuthEcdsaK256Keccak` — ECDSA secp256k1 signature verification
 4. Add the account to the client's local SQLite store
@@ -608,15 +609,22 @@ faucet's compliance procedures:
 - [OZ Miden Confidential Contracts Discussion #39](https://github.com/OpenZeppelin/miden-confidential-contracts/discussions/39)
 - [Protocol Issue #2432: Callbacks](https://github.com/0xMiden/protocol/issues/2432)
 
-**Timeline**: Expected in Miden v0.14 (end of March 2025). Audit follows, estimated
-2 additional weeks.
+**Timeline**:
 
-**Recommendation**: Implement OFAC screening at the application layer before
-submitting transactions. This is independent of on-chain controls and can be done
-today with existing infrastructure.
+| Control | Expected | Source |
+|---------|----------|--------|
+| Denylist/freeze | TBD (originally targeted v0.14) | [OZ Confidential Contracts](https://github.com/OpenZeppelin/miden-confidential-contracts/discussions/39) |
+| Compliance oracle | TBD | Protocol enhancement |
+| Account-level permissions | Available now | `AuthEcdsaK256KeccakAcl` component |
 
-See [docs/COMPLIANCE_ROADMAP.md](../COMPLIANCE_ROADMAP.md) for full details.
+**Recommendations for production:**
+
+1. Implement OFAC screening at the application layer before submitting transactions
+2. Use `AuthEcdsaK256KeccakAcl` for procedure-level access control when available
+3. Monitor OZ Confidential Contracts for denylist/freeze support
+4. Maintain an off-chain compliance database mapping account IDs to verified identities
+5. Consider implementing withdrawal limits and velocity checks in the application layer
 
 ---
 
-[Next: Testing](06-testing.md) | [Back to Index](../WALKTHROUGH.md)
+[Next: Testing](06-testing.md) | [Back to Guide Index](../../README.md#guide)

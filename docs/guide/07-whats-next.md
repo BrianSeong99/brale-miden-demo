@@ -1,6 +1,6 @@
 # What's Next
 
-[Back to Index](../WALKTHROUGH.md) | [Previous: Testing](06-testing.md) | [Next: Brale Integration Mapping](08-brale-integration-mapping.md)
+[Back to Guide Index](../../README.md#guide) | [Previous: Testing](06-testing.md) | [Next: Brale Integration Mapping](08-brale-integration-mapping.md)
 
 ---
 
@@ -11,9 +11,9 @@ as part of the Miden Confidential Contracts project:
 
 | Control | Expected Timeline | Reference |
 |---------|-------------------|-----------|
-| Denylist / freeze | Miden v0.14 (end of March 2025) | [OZ Discussion #39](https://github.com/OpenZeppelin/miden-confidential-contracts/discussions/39) |
-| Compliance callbacks | Miden v0.14 | [Protocol #2432](https://github.com/0xMiden/protocol/issues/2432) |
-| Audit of compliance contracts | ~2 weeks after v0.14 | OpenZeppelin, Trail of Bits |
+| Denylist / freeze | TBD (originally targeted v0.14) | [OZ Discussion #39](https://github.com/OpenZeppelin/miden-confidential-contracts/discussions/39) |
+| Compliance callbacks | TBD | [Protocol #2432](https://github.com/0xMiden/protocol/issues/2432) |
+| Audit of compliance contracts | TBD | OpenZeppelin, Trail of Bits |
 
 Until on-chain controls are available, OFAC screening should be implemented at the
 application layer before submitting transactions.
@@ -26,7 +26,7 @@ application layer before submitting transactions.
 | Deposit webhooks | Not yet available | Poll via `sync_state()` every ~3 seconds |
 | Transaction status polling | Limited | Use expiration block + timeout |
 | "Pay in any token" fees | Planned | Not needed while fees are zero |
-| Mainnet | July 2025 | Testnet and devnet available now |
+| Mainnet | TBD | Testnet and devnet available now |
 
 ## Frontend Demo
 
@@ -42,16 +42,7 @@ planned. It will demonstrate:
 
 ## Appendix A: Configuration Reference
 
-All settings via environment variables or `.env` file:
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `MIDEN_RPC_ENDPOINT` | `https://rpc.testnet.miden.io` | Miden node gRPC endpoint |
-| `PSM_ENDPOINT` | `http://localhost:50051` | PSM server (for multisig) |
-| `SQLITE_STORE_PATH` | `./store.sqlite3` | Client state database |
-| `KEYSTORE_PATH` | `./keystore` | Filesystem key storage |
-| `ISSUER_ACCOUNT_ID` | — | Faucet ID (set after deploy) |
-| `LOG_LEVEL` | `info` | Tracing log level |
+See [README § Configuration](../../README.md#configuration).
 
 ## Appendix B: Binary Reference
 
@@ -64,7 +55,9 @@ All settings via environment variables or `.env` file:
 | `transfer` | `make transfer` | P2ID transfer between accounts |
 | `read_balance` | `make read-balance` | Read account balance |
 | `read_supply` | `make read-supply` | Read total supply |
-| `full_demo` | `make full-demo` | Full E2E lifecycle demo |
+| `full_demo` | `make full-demo` | Full E2E lifecycle demo (alias for `full-demo-public`) |
+| `full_demo` | `make full-demo-public` | E2E demo with public wallet storage |
+| `full_demo` | `make full-demo-private` | E2E demo with private wallet storage (`--private`) |
 | `multisig_demo` | `make multisig-demo` | 2-of-3 multisig demo (requires PSM) |
 
 ## Appendix C: Dependencies
@@ -83,4 +76,4 @@ All settings via environment variables or `.env` file:
 
 ---
 
-[Back to Index](../WALKTHROUGH.md)
+[Back to Guide Index](../../README.md#guide)

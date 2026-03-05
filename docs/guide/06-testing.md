@@ -1,6 +1,6 @@
 # Testing
 
-[Back to Index](../WALKTHROUGH.md) | [Previous: RFI Requirements](05-rfi-requirements.md)
+[Back to Guide Index](../../README.md#guide) | [Previous: RFI Requirements](05-rfi-requirements.md)
 
 ---
 
@@ -8,7 +8,7 @@
 
 ```bash
 make test
-# Runs all 16 tests — no network connection required
+# Runs all 18 tests — no network connection required
 ```
 
 Tests use `MockChain` from `miden-testing`, a deterministic offline Miden execution
@@ -60,6 +60,7 @@ assert_eq!(wallet.vault().get_balance(faucet.id())?, 100);
 | `faucet_sysdata_slot_readable` | Total issuance slot accessible, starts at 0 |
 | `faucet_is_configured_correctly` | Faucet structure and storage initialized properly |
 | `consume_multiple_notes` | Two notes consumed in one tx, balance aggregated |
+| `read_token_metadata_from_faucet` | Token metadata (symbol, decimals, max supply) readable from faucet |
 
 ### Unit Tests (`tests/operations_unit_test.rs`)
 
@@ -74,7 +75,8 @@ assert_eq!(wallet.vault().get_balance(faucet.id())?, 100);
 | `mock_signer_unknown_key_fails` | Signing with unregistered key returns error |
 | `keccak256_hash_word_deterministic` | Same input produces same hash |
 | `keccak256_hash_word_different_inputs` | Different inputs produce different hashes |
+| `signing_test_vector` | Deterministic signing matches published test vectors |
 
 ---
 
-[Next: What's Next](07-whats-next.md) | [Back to Index](../WALKTHROUGH.md)
+[Next: What's Next](07-whats-next.md) | [Back to Guide Index](../../README.md#guide)

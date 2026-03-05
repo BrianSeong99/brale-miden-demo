@@ -1,6 +1,6 @@
 # Miden for Ethereum Engineers
 
-[Back to Index](../WALKTHROUGH.md)
+[Back to Guide Index](../../README.md#guide)
 
 ---
 
@@ -156,4 +156,4 @@ User wallets can be **private** — balances are not visible to the network.
 
 ---
 
-[Next: Architecture](02-architecture.md) | [Back to Index](../WALKTHROUGH.md)
+[Next: Architecture](02-architecture.md) | [Back to Guide Index](../../README.md#guide)
