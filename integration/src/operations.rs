@@ -27,6 +27,8 @@ use tracing::info;
 
 use crate::keystore::BraleKeystore;
 
+const EXPLORER_BASE: &str = "https://testnet.midenscan.com";
+
 // ---------------------------------------------------------------------------
 // Account creation
 // ---------------------------------------------------------------------------
@@ -57,6 +59,7 @@ pub async fn create_wallet_account(
         .context("failed to add wallet account to client")?;
 
     info!(account_id = %account.id(), "created wallet account");
+    println!("  ↳ {EXPLORER_BASE}/account/{}", account.id());
     Ok(account)
 }
 
@@ -106,6 +109,7 @@ pub async fn deploy_issuer_account(
         max_supply,
         "deployed issuer account"
     );
+    println!("  ↳ {EXPLORER_BASE}/account/{}", account.id());
     Ok(account)
 }
 
@@ -136,6 +140,7 @@ pub async fn mint_tokens(
         .context("failed to submit mint transaction")?;
 
     info!(%tx_id, %issuer_id, %target_id, amount, "minted tokens");
+    println!("  ↳ {EXPLORER_BASE}/tx/{tx_id}");
     Ok(())
 }
 
@@ -177,6 +182,7 @@ pub async fn burn_tokens(
         .context("failed to submit burn sender transaction")?;
 
     info!(%tx_id, %sender_id, %issuer_id, amount, "created burn note");
+    println!("  ↳ {EXPLORER_BASE}/tx/{tx_id}");
 
     // Step 2: Wait for burn note to appear in a block, then have the issuer consume it
     let mut consumable;
@@ -221,6 +227,7 @@ pub async fn burn_tokens(
         .context("failed to submit burn consumption transaction")?;
 
     info!(%tx_id, %issuer_id, amount, "burned tokens (issuer consumed burn note)");
+    println!("  ↳ {EXPLORER_BASE}/tx/{tx_id}");
     Ok(())
 }
 
@@ -251,6 +258,7 @@ pub async fn transfer_tokens(
         .context("failed to submit transfer transaction")?;
 
     info!(%tx_id, %sender_id, %recipient_id, amount, "transfer sent (P2ID note created)");
+    println!("  ↳ {EXPLORER_BASE}/tx/{tx_id}");
     Ok(())
 }
 
@@ -306,6 +314,7 @@ pub async fn consume_notes(
         .context("failed to submit consume notes transaction")?;
 
     info!(%tx_id, %account_id, count, "consumed notes");
+    println!("  ↳ {EXPLORER_BASE}/tx/{tx_id}");
     Ok(())
 }
 
