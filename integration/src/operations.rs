@@ -47,7 +47,7 @@ pub async fn create_wallet_account(
 
     let account = AccountBuilder::new(init_seed)
         .account_type(AccountType::RegularAccountImmutableCode)
-        .storage_mode(AccountStorageMode::Private)
+        .storage_mode(AccountStorageMode::Public)
         .with_component(BasicWallet)
         .with_auth_component(AuthEcdsaK256Keccak::new(pub_key_commitment))
         .build()
