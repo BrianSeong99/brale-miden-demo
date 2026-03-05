@@ -35,6 +35,68 @@ It returns:
 This is the same format as Ethereum `eth_sign`. No Miden-specific encoding is needed
 from the MPC provider.
 
+## How the Three Pieces Work Together
+
+```
+┌─────────────────────────────────────────────────┐
+│              miden-client                        │
+│                                                  │
+│  Needs a signature for a transaction             │
+│  Calls: authenticator.get_signature(commitment)  │
+└──────────────────┬──────────────────────────────┘
+                   │
+                   ▼
+┌─────────────────────────────────────────────────┐
+│           BraleKeystore                          │
+│           (implements TransactionAuthenticator)   │
+│                                                  │
+│  ┌─────────────────┐  ┌──────────────────────┐  │
+│  │ FilesystemKey-   │  │ Option<External-     │  │
+│  │ Store (inner)    │  │ Signer> (signer)     │  │
+│  │                  │  │                      │  │
+│  │ Stores keys      │  │ If Some → use this   │  │
+│  │ on disk          │  │ If None → fallback   │  │
+│  │                  │  │ to inner             │  │
+│  └────────┬─────────┘  └──────────┬───────────┘  │
+│           │                       │              │
+│     NOT used for          signer is Some(...)    │
+│     signing here          so this path taken     │
+│                                   │              │
+└───────────────────────────────────┼──────────────┘
+                                    │
+                   ┌────────────────┘
+                   ▼
+┌─────────────────────────────────────────────────┐
+│         ExternalSigner (trait)                    │
+│                                                  │
+│  sign_prehash(commitment, digest) → 65 bytes     │
+│                                                  │
+│  Could be implemented by:                        │
+│    • SimulatedMpcSigner  ← demo uses this        │
+│    • BlockdaemonSigner   ← production            │
+│    • FireblocksSigner    ← production             │
+└──────────────────┬──────────────────────────────┘
+                   │
+                   ▼
+┌─────────────────────────────────────────────────┐
+│       SimulatedMpcSigner                         │
+│       (implements ExternalSigner)                │
+│                                                  │
+│  HashMap<PublicKeyCommitment, SecretKey>          │
+│                                                  │
+│  Looks up key in memory → signs locally          │
+│  (pretends to be a remote MPC service)           │
+│                                                  │
+│  Returns: r[32] || s[32] || v[1] = 65 bytes      │
+└─────────────────────────────────────────────────┘
+```
+
+In the demo, `BraleKeystore` is always constructed with `Some(SimulatedMpcSigner)`,
+so every transaction signature routes through the `ExternalSigner` trait. The
+`FilesystemKeyStore` stores keys but never signs. In production, swap
+`SimulatedMpcSigner` for an HTTP client to your MPC/HSM provider — `BraleKeystore`
+and all operations code stay the same.
+
 ## BraleKeystore: How It Plugs Into the Miden SDK
 
 The Miden SDK's `Client<K>` is generic over an authenticator type `K`. The SDK
