@@ -160,6 +160,7 @@ integration/
     ├── single_signer_test.rs   # MockChain integration tests
     └── operations_unit_test.rs # Unit tests for config, keys, signer
 docs/
+├── DEMO_WALKTHROUGH.md     # Step-by-step demo breakdown (full-demo + multisig-demo)
 ├── SIGNING_SPEC.md         # Byte-level MPC signing protocol
 └── COMPLIANCE_ROADMAP.md   # Compliance limitations and roadmap
 ```
