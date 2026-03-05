@@ -43,27 +43,41 @@ ECDSA K256 (secp256k1) signing with pluggable MPC/HSM backends and PSM multisig.
 cp .env.example .env
 # Edit .env with your RPC endpoint and settings
 
-# 2. Build
+# 2. Build and test
 make build
-
-# 3. Run individual operations
-make create-account      # Create ECDSA K256 wallet
-make deploy-issuer       # Deploy faucet with ECDSA auth
-make mint                # Mint tokens (set ISSUER_ACCOUNT_ID first)
-make transfer            # Transfer tokens between accounts
-make burn                # Burn tokens
-make read-balance        # Read account balance
-make read-supply         # Read total supply
-
-# 4. Run full E2E demo
-make full-demo
-
-# 5. Run multisig demo (requires PSM server)
-make multisig-demo
-
-# 6. Run tests
 make test
 ```
+
+## Make Commands
+
+### Build & Test
+
+| Command | Description |
+|---|---|
+| `make check` | Type-check the workspace (`cargo check`) |
+| `make build` | Build all binaries |
+| `make test` | Run all 18 unit and integration tests (MockChain, no network required) |
+
+### Self-Contained Demos
+
+| Command | Description | Network Required |
+|---|---|---|
+| `make full-demo` | End-to-end single-signer flow: deploy issuer, create wallets, mint, transfer, read balances, burn. Uses a fresh temp store each run. | Miden testnet |
+| `make multisig-demo` | 2-of-3 ECDSA K256 multisig: generate 3 keypairs, create multisig account via PSM, demonstrate threshold signing. | Miden testnet + PSM server |
+
+### Individual Operations
+
+These require `.env` configuration. Set `ISSUER_ACCOUNT_ID` after deploying an issuer.
+
+| Command | Description | CLI Args |
+|---|---|---|
+| `make create-account` | Create an ECDSA K256 wallet | — |
+| `make deploy-issuer` | Deploy a faucet with ECDSA auth | `[symbol] [decimals] [max_supply]` |
+| `make mint` | Mint tokens to a target account | `<target_id> <amount>` |
+| `make transfer` | Transfer tokens between accounts | `<sender_id> <recipient_id> <amount>` |
+| `make burn` | Burn tokens from a sender | `<sender_id> <amount>` |
+| `make read-balance` | Read account token balance | `<account_id>` |
+| `make read-supply` | Read total token supply | — |
 
 ## Project Structure
 
@@ -130,5 +144,5 @@ for details and timeline.
 ## Dependencies
 
 - Miden SDK v0.13 (miden-client, miden-protocol, miden-standards, miden-testing)
-- PSM v0.13.0 (miden-multisig-client, pinned to local path)
+- PSM v0.13.0 (miden-multisig-client from crates.io)
 - Rust nightly-2025-12-10

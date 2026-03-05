@@ -48,7 +48,7 @@ async fn main() -> Result<()> {
 
     let endpoint = Endpoint::try_from(config.miden_rpc_endpoint.as_str())
         .map_err(|e| anyhow::anyhow!(e))?;
-    let rpc = Arc::new(GrpcClient::new(&endpoint, 10_000));
+    let rpc = Arc::new(GrpcClient::new(&endpoint, 30_000));
     let fs_keystore = FilesystemKeyStore::new(config.keystore_path)
         .context("failed to create keystore")?;
     let keystore = Arc::new(BraleKeystore::new(fs_keystore, signer));

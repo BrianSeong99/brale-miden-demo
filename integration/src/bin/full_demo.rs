@@ -22,6 +22,12 @@ async fn main() -> Result<()> {
         .with_env_filter(EnvFilter::new(&config.log_level))
         .init();
 
+    // Use a fresh temp directory for store and keystore so stale state from
+    // previous runs doesn't interfere.
+    let tmp_dir = tempfile::tempdir().context("failed to create temp dir")?;
+    let store_path = tmp_dir.path().join("store.sqlite3");
+    let keystore_path = tmp_dir.path().join("keystore");
+
     // Generate keys for issuer and two wallets
     let issuer_sk = SecretKey::new();
     let issuer_pk = issuer_sk.public_key();
@@ -39,8 +45,8 @@ async fn main() -> Result<()> {
     // Build client
     let endpoint = Endpoint::try_from(config.miden_rpc_endpoint.as_str())
         .map_err(|e| anyhow::anyhow!(e))?;
-    let rpc = Arc::new(GrpcClient::new(&endpoint, 10_000));
-    let fs_keystore = FilesystemKeyStore::new(config.keystore_path)
+    let rpc = Arc::new(GrpcClient::new(&endpoint, 30_000));
+    let fs_keystore = FilesystemKeyStore::new(keystore_path)
         .context("failed to create keystore")?;
     let keystore = Arc::new(BraleKeystore::new(fs_keystore, signer));
 
@@ -53,7 +59,7 @@ async fn main() -> Result<()> {
 
     let mut client = ClientBuilder::new()
         .rpc(rpc)
-        .sqlite_store(config.sqlite_store_path)
+        .sqlite_store(store_path)
         .authenticator(keystore.clone())
         .build()
         .await
@@ -75,6 +81,9 @@ async fn main() -> Result<()> {
     println!("Wallet A: {}", wallet_a.id());
     let wallet_b = operations::create_wallet_account(&mut client, &wallet_b_pk).await?;
     println!("Wallet B: {}", wallet_b.id());
+
+    // Sync again to register note tags for newly created accounts
+    client.sync_state().await.context("failed to sync state after account creation")?;
 
     // Step 3: Mint 1000 tokens to Wallet A
     println!("\n=== Step 3: Mint Tokens ===");

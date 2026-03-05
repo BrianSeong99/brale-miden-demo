@@ -13,19 +13,19 @@ create-account:
 	cargo run -p integration --bin create_account
 
 deploy-issuer:
-	cargo run -p integration --bin deploy_issuer
+	cargo run -p integration --bin deploy_issuer -- $(ARGS)
 
 mint:
-	cargo run -p integration --bin mint
+	cargo run -p integration --bin mint -- $(ARGS)
 
 burn:
-	cargo run -p integration --bin burn
+	cargo run -p integration --bin burn -- $(ARGS)
 
 transfer:
-	cargo run -p integration --bin transfer
+	cargo run -p integration --bin transfer -- $(ARGS)
 
 read-balance:
-	cargo run -p integration --bin read_balance
+	cargo run -p integration --bin read_balance -- $(ARGS)
 
 read-supply:
 	cargo run -p integration --bin read_supply

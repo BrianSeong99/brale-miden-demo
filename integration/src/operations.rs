@@ -178,17 +178,33 @@ pub async fn burn_tokens(
 
     info!(%tx_id, %sender_id, %issuer_id, amount, "created burn note");
 
-    // Step 2: Sync and have the issuer consume the burn note
-    client.sync_state().await.context("failed to sync state after burn note creation")?;
+    // Step 2: Wait for burn note to appear in a block, then have the issuer consume it
+    let mut consumable;
+    let max_attempts = 120;
+    for attempt in 1..=max_attempts {
+        client.sync_state().await.context("failed to sync state after burn note creation")?;
+
+        consumable = client
+            .get_consumable_notes(Some(issuer_id))
+            .await
+            .context("failed to get consumable notes for issuer")?;
+
+        if !consumable.is_empty() {
+            break;
+        }
+
+        if attempt == max_attempts {
+            anyhow::bail!("no consumable burn notes found for issuer after {max_attempts} sync attempts");
+        }
+
+        info!(%issuer_id, attempt, "burn note not yet in block, waiting…");
+        tokio::time::sleep(std::time::Duration::from_secs(3)).await;
+    }
 
     let consumable = client
         .get_consumable_notes(Some(issuer_id))
         .await
         .context("failed to get consumable notes for issuer")?;
-
-    if consumable.is_empty() {
-        anyhow::bail!("no consumable burn notes found for issuer after sync");
-    }
 
     let notes: Vec<_> = consumable
         .into_iter()
@@ -245,17 +261,34 @@ pub async fn consume_notes(
     client: &mut Client<BraleKeystore>,
     account_id: AccountId,
 ) -> Result<()> {
-    client.sync_state().await.context("failed to sync state")?;
+    // Poll until notes appear — the node may not have included the
+    // preceding transaction in a block yet.
+    let mut consumable;
+    let max_attempts = 120;
+    for attempt in 1..=max_attempts {
+        client.sync_state().await.context("failed to sync state")?;
+
+        consumable = client
+            .get_consumable_notes(Some(account_id))
+            .await
+            .context("failed to get consumable notes")?;
+
+        if !consumable.is_empty() {
+            break;
+        }
+
+        if attempt == max_attempts {
+            anyhow::bail!("no consumable notes found for {account_id} after {max_attempts} sync attempts");
+        }
+
+        info!(%account_id, attempt, "no consumable notes yet, waiting for next block…");
+        tokio::time::sleep(std::time::Duration::from_secs(3)).await;
+    }
 
     let consumable = client
         .get_consumable_notes(Some(account_id))
         .await
         .context("failed to get consumable notes")?;
-
-    if consumable.is_empty() {
-        info!(%account_id, "no notes to consume");
-        return Ok(());
-    }
 
     let notes: Vec<_> = consumable
         .into_iter()
