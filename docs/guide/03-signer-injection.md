@@ -1,6 +1,6 @@
 # Signer Injection: MPC/HSM Bridge
 
-[Back to Index](../WALKTHROUGH.md) | [Previous: Architecture](02-architecture.md)
+[Back to Guide Index](../../README.md#guide) | [Previous: Architecture](02-architecture.md)
 
 ---
 
@@ -254,4 +254,4 @@ specification.
 
 ---
 
-[Next: PSM Multisig](04-psm-multisig.md) | [Back to Index](../WALKTHROUGH.md)
+[Next: PSM Multisig](04-psm-multisig.md) | [Back to Guide Index](../../README.md#guide)

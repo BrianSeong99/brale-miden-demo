@@ -1,6 +1,6 @@
 # Brale ↔ Miden Integration Mapping
 
-[Back to Index](../WALKTHROUGH.md) | [Previous: What's Next](07-whats-next.md)
+[Back to Guide Index](../../README.md#guide) | [Previous: What's Next](07-whats-next.md)
 
 ---
 
@@ -219,7 +219,7 @@ Brale's address model maps to Miden accounts:
 
 ```
 Brale: POST /addresses { type: "internal", account_id: "..." }
-Miden: create_wallet_account(client, &pub_key) → Account
+Miden: create_wallet_account(client, &pub_key, storage_mode) → Account
 
 Brale stores: address_id → miden_account_id mapping
 ```
@@ -227,7 +227,7 @@ Brale stores: address_id → miden_account_id mapping
 Each internal address is a Miden account with:
 - `BasicWallet` component (send/receive)
 - `AuthEcdsaK256Keccak` authentication (MPC-compatible)
-- Private storage mode (balance not visible to network)
+- Configurable storage mode (public for explorer visibility, private for balance privacy)
 
 ### External Addresses
 
@@ -260,4 +260,4 @@ Brale currently supports 21+ chains. Here is what is different about Miden:
 
 ---
 
-[Back to Index](../WALKTHROUGH.md)
+[Next: Running the Demos](09-running-demos.md) | [Back to Guide Index](../../README.md#guide)

@@ -1,6 +1,6 @@
 # Architecture
 
-[Back to Index](../WALKTHROUGH.md) | [Previous: Miden for Ethereum Engineers](01-miden-for-ethereum-engineers.md)
+[Back to Guide Index](../../README.md#guide) | [Previous: Miden for Ethereum Engineers](01-miden-for-ethereum-engineers.md)
 
 ---
 
@@ -102,10 +102,11 @@ MPC backend.
 | `src/mock_signer.rs` | `SimulatedMpcSigner` (test double for MPC) | 75 |
 | `src/operations.rs` | All token operations (deploy, mint, burn, transfer, reads) | 351 |
 | `src/multisig.rs` | PSM `KeyManager` bridge (`BraleMpcKeyManager`) | 165 |
+| `src/display.rs` | Table formatting helpers (balance, signer status) | 164 |
 | `src/config.rs` | Environment-based configuration | 42 |
 | `src/helpers.rs` | Template helpers (do not modify) | 364 |
 | `src/bin/*.rs` | 9 executable binaries | ~600 |
-| `tests/*.rs` | 16 passing tests (integration + unit) | ~250 |
+| `tests/*.rs` | 18 passing tests (integration + unit) | ~250 |
 
 ## Signing Patterns
 
@@ -118,4 +119,4 @@ Both use ECDSA secp256k1 (K256). Both are compatible with Blockdaemon BV / Sepio
 
 ---
 
-[Next: Signer Injection](03-signer-injection.md) | [Back to Index](../WALKTHROUGH.md)
+[Next: Signer Injection](03-signer-injection.md) | [Back to Guide Index](../../README.md#guide)

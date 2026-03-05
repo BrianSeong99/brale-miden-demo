@@ -1,6 +1,6 @@
 # PSM: Private Multisig Orchestration
 
-[Back to Index](../WALKTHROUGH.md) | [Previous: Signer Injection](03-signer-injection.md)
+[Back to Guide Index](../../README.md#guide) | [Previous: Signer Injection](03-signer-injection.md)
 
 ---
 
@@ -92,16 +92,10 @@ Signer 1 (Proposer)         PSM Server            Signer 2            Signer 3
 
 ## Running the Multisig Demo
 
-The multisig demo requires a running PSM server:
+See [Running the Demos § PSM Server Setup](09-running-demos.md#psm-server-setup) for
+PSM server instructions, then run:
 
 ```bash
-# Terminal 1: Start PSM server
-git clone https://github.com/OpenZeppelin/private-state-manager
-cd private-state-manager
-cargo run -p private-state-manager-server
-# Default: http://localhost:50051
-
-# Terminal 2: Run demo
 make multisig-demo
 ```
 
@@ -113,4 +107,4 @@ The demo (`integration/src/bin/multisig_demo.rs`):
 
 ---
 
-[Next: RFI Requirements](05-rfi-requirements.md) | [Back to Index](../WALKTHROUGH.md)
+[Next: RFI Requirements](05-rfi-requirements.md) | [Back to Guide Index](../../README.md#guide)

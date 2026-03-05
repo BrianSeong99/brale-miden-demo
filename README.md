@@ -62,62 +62,12 @@ make test
 
 | Command | Description | Network Required |
 |---|---|---|
-| `make full-demo` | End-to-end single-signer flow (see below) | Miden testnet |
-| `make multisig-demo` | 2-of-3 ECDSA K256 multisig flow (see below) | Miden testnet + PSM server |
+| `make full-demo` | Alias for `full-demo-public` | Miden testnet |
+| `make full-demo-public` | E2E single-signer flow with public wallets | Miden testnet |
+| `make full-demo-private` | E2E single-signer flow with private wallets (`--private`) | Miden testnet |
+| `make multisig-demo` | 2-of-3 ECDSA K256 multisig flow | Miden testnet + PSM server |
 
-#### `full-demo` — Single-Signer Token Lifecycle
-
-Demonstrates the complete stablecoin lifecycle using a single custodian (`BraleKeystore` with `SimulatedMpcSigner`). Uses a fresh temp directory per run so there's no stale state.
-
-```
-Step 1: Deploy Issuer
-  → Create an ECDSA K256 faucet account (USDB, 6 decimals, 1T max supply)
-
-Step 2: Create Wallets
-  → Create Wallet A and Wallet B (both ECDSA K256 accounts)
-
-Step 3: Mint Tokens
-  → Issuer mints 1,000 tokens to Wallet A
-  → Wallet A syncs and consumes the mint note
-
-Step 4: Transfer Tokens
-  → Wallet A sends 300 tokens to Wallet B (P2ID note)
-  → Wallet B syncs and consumes the transfer note
-
-Step 5: Read Balances
-  → Wallet A: 700, Wallet B: 300
-
-Step 6: Read Total Supply
-  → Query issuer's on-chain supply counter
-
-Step 7: Burn Tokens
-  → Wallet B burns 100 tokens (sends burn note back to issuer)
-  → Issuer syncs and consumes the burn note
-
-Final State: Wallet A: 700, Wallet B: 200
-```
-
-#### `multisig-demo` — 2-of-3 Threshold Signing
-
-Demonstrates institutional multisig using the PSM (Private State Manager). Requires a running PSM server on `localhost:50051` (see [PSM Server Setup](#psm-server-setup-for-multisig)).
-
-```
-Step 1: Generate 3 ECDSA K256 Keypairs
-  → Each signer has an independent key (simulating 3 custodians)
-
-Step 2: Build MultisigClient
-  → Connect to Miden testnet + PSM server
-  → Authenticate as signer 1
-
-Step 3: Create 2-of-3 Multisig Account
-  → Register all 3 signer commitments with PSM
-  → PSM creates a Miden account with threshold auth (2-of-3)
-
-Step 4: Demonstrate Signing
-  → Signer 1 and Signer 2 each produce signatures
-  → 2 of 3 collected — threshold met
-  → Network only sees the aggregated proof, not individual signatures (privacy)
-```
+See [Running the Demos](docs/guide/09-running-demos.md) for step-by-step breakdown.
 
 ### Individual Operations
 
@@ -133,6 +83,45 @@ These require `.env` configuration. Set `ISSUER_ACCOUNT_ID` after deploying an i
 | `make read-balance` | Read account token balance | `<account_id>` |
 | `make read-supply` | Read total token supply | — |
 
+## RFI Coverage
+
+| # | Requirement | Status | Code |
+|---|-------------|--------|------|
+| 1 | Signer injection (MPC/HSM) | **Working** | `keystore.rs` — `ExternalSigner` trait |
+| 2 | Create wallet / account | **Working** | `operations.rs` — `create_wallet_account()` |
+| 3 | Read token balance | **Working** | `operations.rs` — `read_balance()` |
+| 4 | Read total supply | **Working** | `operations.rs` — `read_total_supply()` |
+| 5 | Deploy / register fungible token | **Working** | `operations.rs` — `deploy_issuer_account()` |
+| 6 | Mint (increase supply) | **Working** | `operations.rs` — `mint_tokens()` |
+| 7 | Burn (reduce supply) | **Working** | `operations.rs` — `burn_tokens()` |
+| 8 | Transfer (holder to recipient) | **Working** | `operations.rs` — `transfer_tokens()` |
+| 9 | Compliance controls (denylist/freeze) | **Roadmap** | [RFI §12](docs/guide/05-rfi-requirements.md#12-compliance-controls-denylist-freeze-wipe) |
+| 10 | Finality signal | **Documented** | [RFI §9](docs/guide/05-rfi-requirements.md#9-finality-model) |
+| 11 | Deposit detection | **Working** | `operations.rs` — `consume_notes()` + `sync_state()` |
+| 12 | Fee estimation | **Roadmap** | [RFI §10](docs/guide/05-rfi-requirements.md#10-fee-estimation--simulation) |
+| 13 | Account activation / opt-in | **None required** | [RFI §11](docs/guide/05-rfi-requirements.md#11-account-activation--token-opt-in) |
+| 14 | Read token metadata | **Working** | `operations.rs` — `read_token_metadata()` |
+| — | Signing test vectors | **Working** | [SIGNING_TEST_VECTORS.md](docs/SIGNING_TEST_VECTORS.md) |
+| — | Brale ↔ Miden mapping | **Documented** | [Integration Mapping](docs/guide/08-brale-integration-mapping.md) |
+| — | Auth scheme clarification | **Documented** | [Signer Injection §Auth Schemes](docs/guide/03-signer-injection.md#supported-authentication-schemes) |
+
+## Guide
+
+1. [Miden for Ethereum Engineers](docs/guide/01-miden-for-ethereum-engineers.md) — mental model, accounts, notes, STARK proofs, faucets, privacy, concept mapping
+2. [Architecture](docs/guide/02-architecture.md) — system diagram, component inventory, signing patterns
+3. [Signer Injection: MPC/HSM Bridge](docs/guide/03-signer-injection.md) — `ExternalSigner` trait, `BraleKeystore`, signing chain, production integration
+4. [PSM: Private Multisig Orchestration](docs/guide/04-psm-multisig.md) — what PSM solves, `KeyManager` bridge, 2-of-3 flow
+5. [RFI Requirements Walkthrough](docs/guide/05-rfi-requirements.md) — all 12 requirements mapped to working code
+6. [Testing](docs/guide/06-testing.md) — `MockChain`, test inventory, running tests
+7. [What's Next](docs/guide/07-whats-next.md) — compliance roadmap, production gaps, binary reference
+8. [Brale ↔ Miden Integration Mapping](docs/guide/08-brale-integration-mapping.md) — concept mapping, transaction lifecycle, deposit detection
+9. [Running the Demos](docs/guide/09-running-demos.md) — full-demo, multisig-demo, storage modes, PSM setup
+
+### Reference Documents
+
+- [SIGNING_SPEC.md](docs/SIGNING_SPEC.md) — byte-level signing protocol specification
+- [SIGNING_TEST_VECTORS.md](docs/SIGNING_TEST_VECTORS.md) — deterministic test vectors for MPC integration validation
+
 ## Project Structure
 
 ```
@@ -140,6 +129,7 @@ integration/
 ├── src/
 │   ├── lib.rs              # Module declarations
 │   ├── config.rs           # Env-based configuration
+│   ├── display.rs          # Table formatting helpers (balance, signer status)
 │   ├── helpers.rs          # Template helpers (DO NOT MODIFY)
 │   ├── keystore.rs         # BraleKeystore + ExternalSigner trait
 │   ├── mock_signer.rs      # SimulatedMpcSigner for testing
@@ -160,9 +150,18 @@ integration/
     ├── single_signer_test.rs   # MockChain integration tests
     └── operations_unit_test.rs # Unit tests for config, keys, signer
 docs/
-├── DEMO_WALKTHROUGH.md     # Step-by-step demo breakdown (full-demo + multisig-demo)
+├── guide/
+│   ├── 01-miden-for-ethereum-engineers.md
+│   ├── 02-architecture.md
+│   ├── 03-signer-injection.md
+│   ├── 04-psm-multisig.md
+│   ├── 05-rfi-requirements.md
+│   ├── 06-testing.md
+│   ├── 07-whats-next.md
+│   ├── 08-brale-integration-mapping.md
+│   └── 09-running-demos.md
 ├── SIGNING_SPEC.md         # Byte-level MPC signing protocol
-└── COMPLIANCE_ROADMAP.md   # Compliance limitations and roadmap
+└── SIGNING_TEST_VECTORS.md # Deterministic test vectors
 ```
 
 ## Configuration
@@ -193,7 +192,7 @@ PSM_STORAGE_PATH=./data/storage PSM_METADATA_PATH=./data/metadata PSM_KEYSTORE_P
 ## Compliance
 
 This demo does **not** enforce denylist/freeze, OFAC screening, KYC/AML, or
-geographic restrictions. See [docs/COMPLIANCE_ROADMAP.md](docs/COMPLIANCE_ROADMAP.md)
+geographic restrictions. See [RFI §12](docs/guide/05-rfi-requirements.md#12-compliance-controls-denylist-freeze-wipe)
 for details and timeline.
 
 ## Dependencies
