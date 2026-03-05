@@ -39,6 +39,7 @@ const EXPLORER_BASE: &str = "https://testnet.midenscan.com";
 pub async fn create_wallet_account(
     client: &mut Client<BraleKeystore>,
     pub_key: &ecdsa_k256_keccak::PublicKey,
+    storage_mode: AccountStorageMode,
 ) -> Result<Account> {
     let mut init_seed = [0u8; 32];
     client.rng().fill_bytes(&mut init_seed);
@@ -47,7 +48,7 @@ pub async fn create_wallet_account(
 
     let account = AccountBuilder::new(init_seed)
         .account_type(AccountType::RegularAccountImmutableCode)
-        .storage_mode(AccountStorageMode::Public)
+        .storage_mode(storage_mode)
         .with_component(BasicWallet)
         .with_auth_component(AuthEcdsaK256Keccak::new(pub_key_commitment))
         .build()

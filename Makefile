@@ -1,4 +1,4 @@
-.PHONY: check build test create-account deploy-issuer mint burn transfer read-balance read-supply full-demo multisig-demo
+.PHONY: check build test create-account deploy-issuer mint burn transfer read-balance read-supply full-demo full-demo-public full-demo-private multisig-demo
 
 check:
 	cargo check --workspace
@@ -30,8 +30,13 @@ read-balance:
 read-supply:
 	cargo run -p integration --bin read_supply
 
-full-demo:
+full-demo-public:
 	cargo run -p integration --bin full_demo
+
+full-demo-private:
+	cargo run -p integration --bin full_demo -- --private
+
+full-demo: full-demo-public
 
 multisig-demo:
 	cargo run -p integration --bin multisig_demo

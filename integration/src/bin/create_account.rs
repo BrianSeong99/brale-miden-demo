@@ -5,6 +5,7 @@ use std::sync::Arc;
 use anyhow::{Context, Result};
 use integration::{config::Config, keystore::BraleKeystore, mock_signer::SimulatedMpcSigner, operations};
 use miden_client::{
+    account::AccountStorageMode,
     auth::AuthSecretKey,
     builder::ClientBuilder,
     keystore::FilesystemKeyStore,
@@ -50,7 +51,7 @@ async fn main() -> Result<()> {
         .await
         .context("failed to build client")?;
 
-    let account = operations::create_wallet_account(&mut client, &public_key).await?;
+    let account = operations::create_wallet_account(&mut client, &public_key, AccountStorageMode::Public).await?;
 
     println!("Wallet account created: {}", account.id());
     Ok(())
