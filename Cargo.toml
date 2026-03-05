@@ -25,6 +25,7 @@ hex = "0.4"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 dotenvy = "0.15"
+tempfile = "3"
 
 # Redirect PSM's git miden-client to the published crates.io version
 [patch."https://github.com/0xMiden/miden-client"]

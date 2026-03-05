@@ -48,7 +48,7 @@ async fn main() -> Result<()> {
 
     let endpoint = Endpoint::try_from(config.miden_rpc_endpoint.as_str())
         .map_err(|e| anyhow::anyhow!(e))?;
-    let rpc = Arc::new(GrpcClient::new(&endpoint, 10_000));
+    let rpc = Arc::new(GrpcClient::new(&endpoint, 30_000));
     let fs_keystore = FilesystemKeyStore::new(config.keystore_path)
         .context("failed to create keystore")?;
     let keystore = Arc::new(BraleKeystore::new(fs_keystore, signer));
@@ -64,6 +64,7 @@ async fn main() -> Result<()> {
         .await
         .context("failed to build client")?;
 
+    client.sync_state().await.context("failed to sync state")?;
     operations::transfer_tokens(&mut client, sender_id, recipient_id, issuer_id, amount).await?;
 
     println!("Transferred {amount} tokens from {sender_id} to {recipient_id}");
