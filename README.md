@@ -62,8 +62,62 @@ make test
 
 | Command | Description | Network Required |
 |---|---|---|
-| `make full-demo` | End-to-end single-signer flow: deploy issuer, create wallets, mint, transfer, read balances, burn. Uses a fresh temp store each run. | Miden testnet |
-| `make multisig-demo` | 2-of-3 ECDSA K256 multisig: generate 3 keypairs, create multisig account via PSM, demonstrate threshold signing. | Miden testnet + PSM server |
+| `make full-demo` | End-to-end single-signer flow (see below) | Miden testnet |
+| `make multisig-demo` | 2-of-3 ECDSA K256 multisig flow (see below) | Miden testnet + PSM server |
+
+#### `full-demo` — Single-Signer Token Lifecycle
+
+Demonstrates the complete stablecoin lifecycle using a single custodian (`BraleKeystore` with `SimulatedMpcSigner`). Uses a fresh temp directory per run so there's no stale state.
+
+```
+Step 1: Deploy Issuer
+  → Create an ECDSA K256 faucet account (USDB, 6 decimals, 1T max supply)
+
+Step 2: Create Wallets
+  → Create Wallet A and Wallet B (both ECDSA K256 accounts)
+
+Step 3: Mint Tokens
+  → Issuer mints 1,000 tokens to Wallet A
+  → Wallet A syncs and consumes the mint note
+
+Step 4: Transfer Tokens
+  → Wallet A sends 300 tokens to Wallet B (P2ID note)
+  → Wallet B syncs and consumes the transfer note
+
+Step 5: Read Balances
+  → Wallet A: 700, Wallet B: 300
+
+Step 6: Read Total Supply
+  → Query issuer's on-chain supply counter
+
+Step 7: Burn Tokens
+  → Wallet B burns 100 tokens (sends burn note back to issuer)
+  → Issuer syncs and consumes the burn note
+
+Final State: Wallet A: 700, Wallet B: 200
+```
+
+#### `multisig-demo` — 2-of-3 Threshold Signing
+
+Demonstrates institutional multisig using the PSM (Private State Manager). Requires a running PSM server on `localhost:50051` (see [PSM Server Setup](#psm-server-setup-for-multisig)).
+
+```
+Step 1: Generate 3 ECDSA K256 Keypairs
+  → Each signer has an independent key (simulating 3 custodians)
+
+Step 2: Build MultisigClient
+  → Connect to Miden testnet + PSM server
+  → Authenticate as signer 1
+
+Step 3: Create 2-of-3 Multisig Account
+  → Register all 3 signer commitments with PSM
+  → PSM creates a Miden account with threshold auth (2-of-3)
+
+Step 4: Demonstrate Signing
+  → Signer 1 and Signer 2 each produce signatures
+  → 2 of 3 collected — threshold met
+  → Network only sees the aggregated proof, not individual signatures (privacy)
+```
 
 ### Individual Operations
 
@@ -129,10 +183,10 @@ All settings via environment variables or `.env` file:
 # Clone the PSM repo
 git clone https://github.com/OpenZeppelin/private-state-manager
 
-# Run the server
+# Run the server (defaults write to /var/psm which requires root — use local paths)
 cd private-state-manager
-cargo run -p private-state-manager-server
-# Default: http://localhost:50051
+PSM_STORAGE_PATH=./data/storage PSM_METADATA_PATH=./data/metadata PSM_KEYSTORE_PATH=./data/keystore cargo run -p private-state-manager-server
+# gRPC: localhost:50051, HTTP: localhost:3000
 ```
 
 ## Compliance
